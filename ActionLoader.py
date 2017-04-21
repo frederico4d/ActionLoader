@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Action Loader",
     "author": "Frederico Martins - Frankenstein",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 78, 3),
     "location": "View3D > Tools > Animation",
     "description": "Lists all Actions and assigns it to active object",
@@ -92,6 +92,8 @@ class UIListPanelExample(bpy.types.Panel):
         layout.template_list("ACTION_UL_list", "", bpy.data, "actions", ob, "action_list_index")
         layout.label(text="Active object:")
         layout.operator("set.actionrange")
+        layout.label (text= "   ")
+        layout.label (text= "---Danger Zone!---")
         layout.operator("delete.action")
 
 class OBJECT_OT_SetActionRange(bpy.types.Operator):
@@ -115,8 +117,9 @@ class OBJECT_OT_AssignAction(bpy.types.Operator):
     bl_idname = "delete.action"
     bl_label = "Delete Action"
     def execute(self, context):
+        ActionNR = bpy.context.object.action_list_index
         bpy.data.actions[bpy.context.object.action_list_index].user_clear()
-        bpy.data.actions.remove(bpy.data.actions[bpy.context.object.action_list_index])
+        bpy.data.actions.remove(bpy.data.actions[ActionNR])
         return{'FINISHED'} 
 
 def register():
