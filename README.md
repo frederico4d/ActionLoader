@@ -18,12 +18,11 @@ I have automated most things, so you just have to select an object, usually an a
 
 - It also displays some information about the actions, that can be helpfull, currently the name, number of frames (from the frame range) and duration in seconds.
 
-### Bugs
-- When objects don't have actions that can give some errors, but it is ok to continue to use, I fixed some of those but probably not all.
+### To do
 
-- In some situations when the action doesn't have frame range defined yet, it can give a bug but you can continue to use it, it will automatically set it on next click.
+- Be able to add an action to objects that don't have any yet.
 
-- It sometimes crashes blender when deleting actions, can't fix this yet.
-
-- Any tips, ideas or help is welcome.
-
+- Add buttons to it, so one doesn't have to go to the dopesheet/ActionEditor.
+1. New Action: Adds new action to active object.
+2. Duplicate Action:duplicates current action.
+3. Delete Action: compleatly removes action (this should have a warning since it is not the same as just removing fake user.)
