@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Action Loader",
     "author": "Frederico Martins - Frankenstein",
-    "version": (1, 1),
+    "version": (1, 2),
     "blender": (2, 78, 3),
     "location": "View3D > Tools > Animation",
     "description": "Lists all Actions and assigns it to active object",
@@ -13,6 +13,11 @@ bl_info = {
 import bpy
 
 def update_action_list(self, context):
+    print ("UPDATE!!!")
+    if  bpy.context.object.animation_data.action == None:
+        print ("Up NO ACTION")
+        pass
+    
     ActiveAction = bpy.context.scene.objects.active.animation_data.action
     ActiveAction.use_fake_user = True
     ## First assign start and end frame props to current action
@@ -77,25 +82,49 @@ class UIListPanelExample(bpy.types.Panel):
         ob = context.object
         
         indice = bpy.context.object.action_list_index 
-        if bpy.data.actions[indice].get("EndFrame") == None:
-            durationf = 0
-            durations = 0
-        else:
-            durationf = bpy.data.actions[indice]["EndFrame"] - bpy.data.actions[indice]["StartFrame"]
-            durations = durationf / bpy.context.scene.render.fps 
         
-        #info = str(indice+1)+". "+bpy.data.actions[indice].name+ " | "+ str(durationf)+"f | "+ str(round(durations,4))+"s"
-        info1 = "Name: "+bpy.data.actions[indice].name
-        info2 = "Duration: " + str(durationf)+ " f. | "+ str(round(durations,6))+ "s. "
-        layout.label (text = info1)
-        layout.label (text = info2)
+        if  bpy.context.object.animation_data == None or bpy.context.object.animation_data.action == None:
+            #print ("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOO -1")
+            
+            if bpy.context.object.animation_data == None:info1 = "NO 'animation_data'"
+            elif bpy.context.object.animation_data.action == None:info1 = "NO 'action'"
+            else: info1 = "OBJECT HAS NO ACTION"
+            print ("NO ACTION------------")
+            info2 = ": --"
+
+        elif bpy.context.object.animation_data.action:
+            #print ("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOO -2")
+            AA = bpy.context.object.animation_data.action ##ActiveAction
+            
+            if AA.get("EndFrame") == None:
+                durationf = 0
+                durations = 0
+            else:
+                durationf = AA["EndFrame"] - AA["StartFrame"]
+                #durationf = 666
+
+                durations = durationf / bpy.context.scene.render.fps 
+            info1 = AA.name
+            info2 = ": " + str(durationf)+ " f. | "+ str(round(durations,6))+ " s. "
+     
+        else:
+            print ("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOO -3")
+            info1 = "---"
+            info2 = ": ---"
+        
+        layout.label (text = ": "+ob.name, icon = "OBJECT_DATAMODE")
+        layout.label (text = ": "+info1, icon = "ACTION")
+        layout.label (text = info2, icon = "PREVIEW_RANGE")
         layout.template_list("ACTION_UL_list", "", bpy.data, "actions", ob, "action_list_index")
+        """
         layout.label(text="Active object:")
-        layout.operator("set.actionrange")
+        #layout.operator("set.actionrange")
+ 
+        layout.operator("ttt.action")
         layout.label (text= "   ")
         layout.label (text= "---Danger Zone!---")
         layout.operator("delete.action")
-
+        """
 class OBJECT_OT_SetActionRange(bpy.types.Operator):
     """Sets current timeline range to action"""
     bl_idname = "set.actionrange"
@@ -110,16 +139,30 @@ class OBJECT_OT_SetActionRange(bpy.types.Operator):
         ActiveAction["EndFrame"] = bpy.context.scene.frame_preview_end
         print ("Actio StartFrame: ", ActiveAction["StartFrame"], " Action EndFrame: ", ActiveAction["EndFrame"])
         return{'FINISHED'} 
+  
+class OBJECT_OT_tttAction(bpy.types.Operator):
+    """Load Action to Active Object"""
+    bl_idname = "ttt.action"
+    bl_label = "ttt Action"
+    def execute(self, context):
+        
+        
+        print("TTT: ")
+        return{'FINISHED'}   
     
-    
-class OBJECT_OT_AssignAction(bpy.types.Operator):
+class OBJECT_OT_DeleteAction(bpy.types.Operator):
     """Load Action to Active Object"""
     bl_idname = "delete.action"
     bl_label = "Delete Action"
     def execute(self, context):
         ActionNR = bpy.context.object.action_list_index
-        bpy.data.actions[bpy.context.object.action_list_index].user_clear()
-        bpy.data.actions.remove(bpy.data.actions[ActionNR])
+        print(bpy.data.actions[ActionNR])
+        
+        #use_fake_user = True
+        
+        #bpy.ops.outliner.id_operation(type='DELETE')
+        #bpy.data.actions[bpy.context.object.action_list_index].user_clear()
+        #bpy.data.actions.remove(bpy.data.actions[ActionNR])
         return{'FINISHED'} 
 
 def register():
