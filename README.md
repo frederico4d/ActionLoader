@@ -9,11 +9,15 @@ preview: https://www.youtube.com/watch?v=aQrfsufhyWw
 ## How to use?
 
 I have automated most things, so you just have to select an object, usually an armature, and select the actions from the list.
-And you get:
 
-- It will automatically save the current frame range on the current action, apply the newly selected action, set the frame range on the scene from the selected action, and zoom in on all time viewers (Timeline Dopesheet Editor and Graph Editor). 
+And with that one click you get:
+- It will automatically save the current frame range on the current action;
+- Apply the newly selected action;
+- Set the frame range on the scene from the selected action; (optionally: set frame range from first and last keyframe.)
+- Zoom in on all time viewers (Timeline Dopesheet Editor and Graph Editor). 
 
-- You can even do that while playing the animations in loop for a really quick preview of all your work.
+And:
+- You can switch from animation while playing the animations in loop for a really quick preview of all your work.
 
 - It also ads fake users to the actions automatically so you don't have to think about it nor worry about loosing actions
 
