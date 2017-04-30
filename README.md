@@ -7,7 +7,7 @@ preview: https://www.youtube.com/watch?v=aQrfsufhyWw
 
 ## What are actions?
 
-If you are not aware of how actions work, or are not used to blender. Actions are the way blender stores animations for objects, and for armatures(Rigs). This means each action will have a complete animation for an entire rig, including all the complex constraints and key frames you can throw it. So, with this addon, you are able to switch between entire actions with one click.
+If you are not aware of how actions work, or are not used to blender. Actions are the way blender stores animations for objects, and for armatures(Rigs). This means each action will have a complete animation for an entire rig, including all the complex constraints and key frames you can throw at it. So, with this addon, you are able to switch between entire actions with one click.
 Actions also work interchangeably between objects (or entire rigs) this means you can have different characters, with different rigs and totally different proportions, and still use the same animations in both, as long as you use the same name for the bones (you can also have specific bones for each characters that those speficil animations will also be stored).
 
 ## How to use Action Loader?
