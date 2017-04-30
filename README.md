@@ -1,12 +1,16 @@
-# BlenderScripts
-Action Loader
+# Action Loader
 ActionLoader.py
 
 Action Loader is an addon for quickly displaying and loading actions into a model. It was done particularly to manage multiple actions / animations on the same character, for game animations.
 
 preview: https://www.youtube.com/watch?v=aQrfsufhyWw
 
-## How to use?
+## What are actions?
+
+If you are not aware of how actions work, or are not used to blender. Actions are the way blender stores animations for objects, and for armatures(Rigs). This means each action will have a complete animation for an entire rig, including all the complex constraints and key frames you can throw it. So, with this addon, you are able to switch between entire actions with one click.
+Actions also work interchangeably between objects (or entire rigs) this means you can have different characters, with different rigs and totally different proportions, and still use the same animations in both, as long as you use the same name for the bones (you can also have specific bones for each characters that those speficil animations will also be stored).
+
+## How to use Action Loader?
 
 I have automated most things, so you just have to select an object, usually an armature, and select the actions from the list.
 
@@ -19,11 +23,11 @@ And with that one click you get:
 And:
 - You can switch from animation while playing the animations in loop for a really quick preview of all your work.
 
-- It also ads fake users to the actions automatically so you don't have to think about it nor worry about loosing actions
+- It also ads fake users to the actions automatically so you don't have to think about it nor worry about loosing actions.
 
 - There is a filter in the list, so that if you have hundreads of animations, just carefully name them, and use that filter to display only a set of animations, for example, fighting animations can have a tag in the name, and you filter for it etc...
 
-- It also displays some information about the actions, that can be helpfull, currently the name, number of frames (from the frame range) and duration in seconds. 
+- It also displays some information about the actions, that can be helpfull, currently: the name, number of frames (from the frame range) and duration in seconds, number of users, and if it has a fake user (for your mental sanity check!). 
 
 - Other info: shows the total number of animations in the file and number of listed (filtered) animations.
 
