@@ -269,6 +269,7 @@ class UIListPanelExample(bpy.types.Panel):
         else:
             rangemode_icon = "SPACE3"
         
+        
         row = layout.row(align=True)
         row.label(text = "Prev Speed:")
         
@@ -283,6 +284,8 @@ class UIListPanelExample(bpy.types.Panel):
         else:
             speednext = "Reset"
         
+        if ob == None or ob.animation_data == None or ob.animation_data.action == None:
+            row.enabled = False
         row.operator("speeddown.action", text =speednext)
            
         layout.label(text = "Set Frame Range:")
