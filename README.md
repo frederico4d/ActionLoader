@@ -40,4 +40,4 @@ Any comments, ideas etc... are welcome, please issue them!
 
 [- Hey, get some bitcoins!](https://freebitco.in/?r=335281)
 
-[center][url=https://freebitco.in/?r=335281][b][size=15pt][color=red]Win Free Bitcoins every hour! - [/color][color=green]www.freebitco.in[/color][/size][/b][/url][/center]
+
