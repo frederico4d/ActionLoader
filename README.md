@@ -36,3 +36,6 @@ And:
 - Be able to add an action to objects that don't have any yet.
 
 Any comments, ideas etc... are welcome, please issue them!
+
+
+[- Hey, get some bitcoins!](https://freebitco.in/?r=335281)
