@@ -31,13 +31,9 @@ And:
 
 - Other info: shows the total number of animations in the file and number of listed (filtered) animations.
 
-### To do
-
-- Be able to add an action to objects that don't have any yet.
-
 Any comments, ideas etc... are welcome, please issue them!
 
-Links:
+###Links:
 
 [Thread on Blenderartists.org](https://blenderartists.org/forum/showthread.php?420530-AddOn-Action-Loader)
 
