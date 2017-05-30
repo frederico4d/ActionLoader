@@ -1,7 +1,7 @@
 # Action Loader
 ActionLoader.py
 
-Action Loader is an addon for quickly displaying and loading actions into a model. It was done particularly to manage multiple actions / animations on the same character, for game animations.
+Action Loader is a Blender addon for quickly displaying and loading actions into a model. It was done particularly to manage multiple actions / animations on the same character, for game animations.
 
 preview: https://www.youtube.com/watch?v=aQrfsufhyWw
 
