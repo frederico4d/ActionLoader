@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Action Loader",
     "author": "Frederico Martins",
-    "version": (1, 5),
+    "version": (1, 6),
     "blender": (2, 78, 0),
     "location": "View3D > Tools > Animation",
     "description": "Lists all Actions and assigns it to active object",
@@ -258,8 +258,10 @@ class UIListPanelExample(bpy.types.Panel):
                 info2 = str(durationf)+ " f. | "+ str(round(durations,6))+ " s. "
                 
                 # Draw Info!            
-                layout.label(text =  str(AA.users)+"Users "+fakeuser + " | " + str(len(AA.pose_markers))+"Markers", icon = "INFO")   
-        
+                row = layout.row(align=True)
+                row.label(text =  str(AA.users)+"Users "+fakeuser + " | " + str(len(AA.pose_markers))+"Markers", icon = "INFO")   
+                row.operator("renderprev.action", icon = "RENDER_ANIMATION")
+                
             if context.scene.actionloader_rangemode == '1':
                 rangemode_icon = "SPACE2"
             else:
@@ -293,6 +295,8 @@ class UIListPanelExample(bpy.types.Panel):
             
             # Draw Info!  
             layout.label(text =  str(ListedAction.users)+"Users "+fakeuser + " | " + str(len(ListedAction.pose_markers))+"Markers", icon = "INFO")   
+            
+        
             
             durations = durationf / bpy.context.scene.render.fps 
             info2 = str(durationf)+ " f. | "+ str(round(durations,6))+ " s. "
@@ -344,6 +348,9 @@ class UIListPanelExample(bpy.types.Panel):
         #layout.operator("ttt.action", text ="Scene Markers from Pose Markers")
         layout.label (text = "Other Tools: ")
         layout.operator("delete.action", icon = "ERROR")
+        
+        #layout.label (text = "Render Preview:")
+        #layout.operator("renderprev.action",text = "Render Preview", icon = "RENDER_ANIMATION")
         
         layout.label(text= "Options:")
         layout.prop(bpy.context.scene, "actionloader_showicons", text="Show Icons")
@@ -475,6 +482,32 @@ class OBJECT_OT_customByRange(bpy.types.Operator):
         ActiveAction["frame_start"] = ActiveAction.frame_range[0]
         ActiveAction["frame_end"] = ActiveAction.frame_range[1]
         update_rangemode(self, bpy.context)
+        return{'FINISHED'} 
+
+
+class OBJECT_OT_renderprev(bpy.types.Operator):
+    """Render Preview with Action Name (set output path to end in "/", without filename)"""
+    bl_idname = "renderprev.action"
+    bl_label = ""
+    def execute(self, context):
+        cam = bpy.context.scene.render.filepath 
+        
+        if bpy.context.scene.render.image_settings.file_format == 'THEORA'and bpy.context.scene.render.use_file_extension == False:
+            ext = ".ogv" 
+        else:
+            ext = ""
+        
+        bpy.context.scene.render.filepath = cam + bpy.context.object.animation_data.action.name + ext
+        
+        
+        if bpy.context.space_data.show_only_render == False:
+            bpy.context.space_data.show_only_render = True
+            bpy.ops.render.opengl(animation=True)
+            bpy.context.space_data.show_only_render = False
+        else:
+            bpy.ops.render.opengl(animation=True)
+        
+        bpy.context.scene.render.filepath = cam 
         return{'FINISHED'} 
 
 
