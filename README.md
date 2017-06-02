@@ -12,6 +12,8 @@ Actions also work interchangeably between objects (or entire rigs) this means yo
 
 ## How to use Action Loader?
 
+![ActionLoader](ActionLoader_tips.png)
+
 I have automated most things, so you just have to select an object, usually an armature, and select the actions from the list.
 
 And with that one click you get:
