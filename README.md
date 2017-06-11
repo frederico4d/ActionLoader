@@ -42,4 +42,7 @@ Any comments, ideas etc... are welcome, please issue them!
 
 Want to to help me out without actually spending money? then [Get some bitcoins!](https://freebitco.in/?r=335281) looks fishy, but it is nothing special, just gives a very small amount of bitcoins hourly, and I get a refferal if you sign up from that link, so thank you for that!
 
+or 
+
+[![gitcheese.com](https://s3.amazonaws.com/gitcheese-ui-master/images/badge.svg)](https://www.gitcheese.com/donate/users/11646349/repos/89007583)
 
