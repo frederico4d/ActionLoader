@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Action Loader",
     "author": "Frederico Martins",
-    "version": (1, 6),
+    "version": (1, 7),
     "blender": (2, 78, 0),
     "location": "View3D > Tools > Animation",
     "description": "Lists all Actions and assigns it to active object",
@@ -11,56 +11,122 @@ bl_info = {
     "category": "Animation",
     }
 
+## TODO
+
+### novas funcoes
+## meter mais paineis duplicaveis em vez de so 2?
+
+## meter o action loader nas properties ou em outro lado 
+#para se puder ver num painel separado, em outro ecra etc...
+
+### optimizações
+
 import bpy
+
+def set_prevspeed(self, value):
+    global prev_mode 
+    global old_prevspeed 
+    old_prevspeed = bpy.context.scene.actionloader_speedprev
+    if bpy.context.scene.actionloader_speedprev == "0":
+        print ("ZERO")
+        prev_mode = bpy.context.scene.use_preview_range
+    self["testprop"] = value
+    
+  
+def get_prevspeed(self):
+    #print("get")
+    return self["testprop"]
+
 
 def update_prevspeed(self, context):
     speed = bpy.context.scene.actionloader_speedprev
-    global prev_mode 
+    
     print("SPEEDCHANGE")
-    if context.object == None or context.object.animation_data == None or context.object.animation_data.action == None:
-        bpy.context.scene.render.frame_map_new = 100
-    else:
-        ob = context.object
-        ActiveAction = ob.animation_data.action
-        if context.scene.actionloader_rangemode == "0":
-            sframe = ActiveAction["frame_start"]
-            eframe = ActiveAction["frame_end"]
-        else:
-            sframe = ActiveAction.frame_range[0]
-            eframe = ActiveAction.frame_range[1]
+    ob = bpy.context.scene.objects.active
+    #ob = context.object
+    scn = context.scene
+    ActiveAction = ob.animation_data.action
         
-        if speed == "1":
-            context.scene.frame_start = sframe*2
-            context.scene.frame_end = eframe*2
-            context.scene.render.frame_map_new = 200
-            context.scene.frame_current = context.scene.frame_current*2
-            prev_mode = bpy.context.scene.use_preview_range 
-            context.scene.use_preview_range = False
-        elif speed == "2":
-            context.scene.frame_start = sframe*4
-            context.scene.frame_end = eframe*4
-            context.scene.render.frame_map_new = 400
-            context.scene.frame_current = context.scene.frame_current*4
-            context.scene.use_preview_range = False
-        elif speed == "3":
-            context.scene.frame_start = sframe*8
-            context.scene.frame_end = eframe*8
-            context.scene.render.frame_map_new = 800
-            context.scene.frame_current = context.scene.frame_current*8
-            context.scene.use_preview_range = False
-        elif speed == "0":
-            context.scene.frame_start = sframe
-            context.scene.frame_end = eframe
-            context.scene.render.frame_map_new = 100
-            context.scene.frame_current = sframe # context.scene.frame_current*8
-            bpy.context.scene.use_preview_range = prev_mode
-            
+    if scn.actionloader_rangemode == "0":
+        sframe = ActiveAction["frame_start"]
+        eframe = ActiveAction["frame_end"]
+    else:
+        sframe = ActiveAction.frame_range[0]
+        eframe = ActiveAction.frame_range[1]
+    
+    print("OLD: ",old_prevspeed)
+    
+    if speed == "0":
+        scn.frame_start = sframe
+        scn.frame_end = eframe
+        scn.render.frame_map_new = 100
+        if old_prevspeed == "1":
+            scn.frame_current = scn.frame_current / 2 
+        elif old_prevspeed == "2":
+            scn.frame_current = scn.frame_current / 4 
+        elif old_prevspeed == "3":
+            scn.frame_current = scn.frame_current / 8
+        scn.use_preview_range = prev_mode
+        
+    elif speed == "1":
+        scn.frame_start = sframe*2
+        scn.frame_end = eframe*2
+        scn.render.frame_map_new = 200
+        if old_prevspeed == "0":
+            scn.frame_current = scn.frame_current * 2
+        elif old_prevspeed == "2":
+            scn.frame_current = scn.frame_current / 2 
+        elif old_prevspeed == "3":
+            scn.frame_current = scn.frame_current / 4 
+        scn.use_preview_range = False
+    
+    elif speed == "2":
+        scn.frame_start = sframe*4
+        scn.frame_end = eframe*4
+        scn.render.frame_map_new = 400
+        if old_prevspeed == "0":
+            scn.frame_current = scn.frame_current * 4
+        elif old_prevspeed == "1":
+            scn.frame_current = scn.frame_current * 2
+        elif old_prevspeed == "3":
+            scn.frame_current = scn.frame_current / 2
+        scn.use_preview_range = False
+    
+    elif speed == "3":
+        scn.frame_start = sframe*8
+        scn.frame_end = eframe*8
+        scn.render.frame_map_new = 800
+        if old_prevspeed == "0":
+            scn.frame_current = scn.frame_current * 8
+        elif old_prevspeed == "1":
+            scn.frame_current = scn.frame_current * 4
+        elif old_prevspeed == "2":
+            scn.frame_current = scn.frame_current * 2
+        scn.use_preview_range = False
     
 
+def set_normal_speed():
+    scn = bpy.context.scene
+    if bpy.context.object == None or bpy.context.object.animation_data == None or bpy.context.object.animation_data.action == None:
+        pass
+    else:
+        ActiveAction = scn.objects.active.animation_data.action
+        if ActiveAction.get("frame_start") != None:
+            scn.frame_start = ActiveAction["frame_start"]
+            scn.frame_end = ActiveAction["frame_end"]
+        else:
+            scn.frame_start = ActiveAction.frame_range[0]
+            scn.frame_end = ActiveAction.frame_range[1]
+
+    scn.use_preview_range = prev_mode
+    scn.actionloader_speedprev = '0'
+    scn.render.frame_map_new = 100
+ 
+
 def update_rangemode(self, context):
-    #if context.object == None:
-    #    pass
-    ActiveAction = context.object.animation_data.action
+    ob = bpy.context.scene.objects.active
+    ActiveAction = ob.animation_data.action
+    
     if context.scene.actionloader_rangemode == "0":
         if ActiveAction.get("frame_start") == None:
             pass
@@ -80,12 +146,36 @@ def update_rangemode(self, context):
     
 def update_action_list_noObj(self, context):
     pass
+
+def save_action_extras():
+    scn = bpy.context.scene
+    ob = scn.objects.active
+    if ob:
+        ActiveAction = ob.animation_data.action
+    else:
+        ActiveAction = bpy.data.actions[scn.action_list_index]
     
+    ActiveAction.use_fake_user = True
+       
+    ## Assign start and end frame props to current action
+    if scn.actionloader_rangemode == "0" and scn.actionloader_autorange:
+        if scn.use_preview_range: 
+            ActiveAction["frame_start"] = scn.frame_preview_start
+            ActiveAction["frame_end"] = scn.frame_preview_end
+        else:
+            ActiveAction["frame_start"] = scn.frame_start
+            ActiveAction["frame_end"] = scn.frame_end   
+    
+    #Saves current markers to action
+    if scn.actionloader_markers and ob:
+        save_markers_to_action()    
+
 def update_action_list(self, context):
     #updates every time you pick action in the list
-    ob = context.object
-    
-    if context.scene.render.frame_map_new != 100:
+    ob = bpy.context.scene.objects.active
+    #ob = context.object
+    scn = context.scene
+    if scn.render.frame_map_new != 100:
         set_normal_speed()
     
     if ob.animation_data == None:
@@ -96,47 +186,49 @@ def update_action_list(self, context):
         action = 2 # Has Action
     
     if action == 2: # Has action
-        ActiveAction = context.scene.objects.active.animation_data.action
+        save_action_extras()
+        """
+        ActiveAction = scn.objects.active.animation_data.action
         ActiveAction.use_fake_user = True
        
         ## Assign start and end frame props to current action
-        if context.scene.actionloader_rangemode == "0" and context.scene.actionloader_autorange:
+        if scn.actionloader_rangemode == "0" and scn.actionloader_autorange:
             if context.scene.use_preview_range: 
                 print("bb")
-                ActiveAction["frame_start"] = context.scene.frame_preview_start
-                ActiveAction["frame_end"] = context.scene.frame_preview_end
+                ActiveAction["frame_start"] = scn.frame_preview_start
+                ActiveAction["frame_end"] = scn.frame_preview_end
             else:
                 print("cc")
-                ActiveAction["frame_start"] = context.scene.frame_start
-                ActiveAction["frame_end"] = context.scene.frame_end   
+                ActiveAction["frame_start"] = scn.frame_start
+                ActiveAction["frame_end"] = scn.frame_end   
         
         #Saves current markers to action
-        if bpy.context.scene.actionloader_markers:
+        if scn.actionloader_markers:
             save_markers_to_action()
-     
+        """ 
     elif action == 0: # No Animation data
         ob.animation_data_create()
 
     #then change the action to the picked on the list
-    ob.animation_data.action = bpy.data.actions[context.object.action_list_index]
+    ob.animation_data.action = bpy.data.actions[ob.action_list_index]
     
     ActiveAction = context.scene.objects.active.animation_data.action
     ActiveAction.use_fake_user = True
     
     # Changes the range on the scene
     
-    if ActiveAction.get("frame_start") != None and context.scene.actionloader_autorange:
+    if ActiveAction.get("frame_start") != None and scn.actionloader_autorange:
         if context.scene.actionloader_rangemode == "0":
-            context.scene.frame_preview_start = ActiveAction["frame_start"]
-            context.scene.frame_preview_end = ActiveAction["frame_end"] 
-            context.scene.frame_start = ActiveAction["frame_start"]
-            context.scene.frame_end = ActiveAction["frame_end"] 
+            scn.frame_preview_start = ActiveAction["frame_start"]
+            scn.frame_preview_end = ActiveAction["frame_end"] 
+            scn.frame_start = ActiveAction["frame_start"]
+            scn.frame_end = ActiveAction["frame_end"] 
         
         elif context.scene.actionloader_rangemode == "1":
-            context.scene.frame_preview_start = ActiveAction.frame_range[0]
-            context.scene.frame_preview_end = ActiveAction.frame_range[1]
-            context.scene.frame_start = ActiveAction.frame_range[0]
-            context.scene.frame_end = ActiveAction.frame_range[1]  
+            scn.frame_preview_start = ActiveAction.frame_range[0]
+            scn.frame_preview_end = ActiveAction.frame_range[1]
+            scn.frame_start = ActiveAction.frame_range[0]
+            scn.frame_end = ActiveAction.frame_range[1]  
 
         #center stuff on dopesheet etc...
         for area in context.screen.areas:
@@ -158,19 +250,40 @@ def update_action_list(self, context):
                         override = {'area': area, 'region': region, 'edit_object': context.edit_object}
                         bpy.ops.time.view_all(override)    
     
-    if context.scene.actionloader_markers == True:
+    if scn.actionloader_markers == True:
         change_timelinemarkers_from_action()
-        
-        
-class ACTION_UL_list(bpy.types.UIList):
+
+
+class ACTION_UL_list2(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         self.use_filter_show = True
-        ob = data
+        ob = bpy.context.scene.objects.active
+        #ob = bpy.context.object
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             if bpy.context.scene.actionloader_showicons:
                 layout.prop(item, "name", text="", emboss=False, icon_value=icon)
             else: 
                 layout.prop(item, "name", text="", emboss=False)
+                #layout.operator("delete.action", text="", icon = "ERROR").delaction = bpy.data.actions[ob.action_list_index].name
+                #layout.operator("ttt.action", text ="T").nome = str(self._DATA)
+                #layout.label(text = "", icon = "ERROR")
+        elif self.layout_type in {'GRID'}:
+            pass
+        global filter_name2
+        filter_name2 = self.filter_name
+        
+class ACTION_UL_list(bpy.types.UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+        self.use_filter_show = True
+        ob = bpy.context.scene.objects.active
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            if bpy.context.scene.actionloader_showicons:
+                layout.prop(item, "name", text="", emboss=False, icon_value=icon)
+            else: 
+                layout.prop(item, "name", text="", emboss=False)
+                #layout.operator("delete.action", text="", icon = "ERROR").delaction = bpy.data.actions[ob.action_list_index].name
+                #layout.operator("ttt.action", text ="T").nome = str(self._DATA)
+                #layout.label(text = "", icon = "ERROR")
         elif self.layout_type in {'GRID'}:
             pass
         global filter_name
@@ -181,15 +294,22 @@ class UIListPanelExample(bpy.types.Panel):
     """Creates a Panel in the Animation tab of the 3D View's Tools"""
     bl_label = "Action Loader"
     bl_idname = "OBJECT_PT_ui_list_example"
+    """
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "scene"
+    """
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_category = "Animation"
-
+    
     def draw(self, context):
         layout = self.layout
-        ob = context.object
-        animation = True
+        scn = context.scene
+        ob = scn.objects.active
+        #ob = context.object
         
+        animation = True
         if context.scene.objects.active != None:
             # Sets icon depending on what is selected and the current mode.
             if context.mode == "OBJECT":
@@ -270,10 +390,8 @@ class UIListPanelExample(bpy.types.Panel):
             row = layout.row(align=True)
             row.label (text = info2, icon = "PREVIEW_RANGE")  
             row.label(icon = rangemode_icon)        
-            
-            #UIlist
-            layout.template_list("ACTION_UL_list", "", bpy.data, "actions", ob, "action_list_index")
-        
+            list_context = ob
+
         elif context.scene.objects.active == None and len(bpy.data.actions) >=1:
             
             ListedAction = bpy.data.actions[bpy.context.scene.action_list_index]
@@ -296,8 +414,6 @@ class UIListPanelExample(bpy.types.Panel):
             # Draw Info!  
             layout.label(text =  str(ListedAction.users)+"Users "+fakeuser + " | " + str(len(ListedAction.pose_markers))+"Markers", icon = "INFO")   
             
-        
-            
             durations = durationf / bpy.context.scene.render.fps 
             info2 = str(durationf)+ " f. | "+ str(round(durations,6))+ " s. "
             
@@ -310,12 +426,19 @@ class UIListPanelExample(bpy.types.Panel):
             row.label (text = info2, icon = "PREVIEW_RANGE")  
             row.label(icon = rangemode_icon)              
             
-            #UIList - no object
-            layout.template_list("ACTION_UL_list", "", bpy.data, "actions", context.scene, "action_list_index")
-        
+            list_context = scn
+   
         else:
-            layout.label (text= "Just start animating!", icon = "INFO")
-            
+            layout.label (text= "Just start animating!", icon = "INFO")  
+            list_context = scn
+        
+        #UIList - no object
+        row = layout.row(align=True)
+        row.template_list("ACTION_UL_list", "", bpy.data, "actions", list_context, "action_list_index")
+        if bpy.context.scene.actionloader_DualView:
+            row.template_list("ACTION_UL_list2", "", bpy.data, "actions", list_context, "action_list_index")
+        
+        ## First View!!!!!!!!!!!!!!!!!!!1
         action_names= []
         for x in range (len(bpy.data.actions)):
             action_names.append(bpy.data.actions[x].name.lower())
@@ -325,11 +448,37 @@ class UIListPanelExample(bpy.types.Panel):
         total_anims=len(bpy.data.actions.items())
         listed_anims =len(filtered_actions)
         
+        row = layout.row(align=True)
+        
         if filter_name == "":
-            layout.label(text = "Total: "+ str(total_anims) +" anims", icon = "INFO")        
+            row.label(text = str(total_anims) +" anims total", icon = "INFO")        
         else:
-            layout.label(text = "Listed: "+ str(listed_anims)+ " of " +str(total_anims) +" anims", icon = "INFO")
+            row.label(text = str(listed_anims)+ " of " +str(total_anims) +" anims", icon = "INFO")
+        
+        ## DualView!!!!!!!!!!!!!!!!!!!!2
+        if bpy.context.scene.actionloader_DualView:
+            action_names= []
+            for x in range (len(bpy.data.actions)):
+                action_names.append(bpy.data.actions[x].name.lower())
 
+            filtered_actions = [k for k in action_names if filter_name2.lower() in k]
+            
+            total_anims=len(bpy.data.actions.items())
+            listed_anims =len(filtered_actions)
+        
+            if filter_name2 == "":
+                row.label(text = str(total_anims) +" anims total", icon = "INFO")        
+            else:
+                row.label(text = str(listed_anims)+ " of " +str(total_anims) +" anims", icon = "INFO")      
+        
+        # DUAL VIEW ICON BT
+        if scn.actionloader_DualView:
+            dual_icon = "GO_LEFT"
+        else:    
+            dual_icon = "SPLITSCREEN"
+        row.prop(scn, 'actionloader_DualView', text = "", icon = dual_icon)
+        
+        #Icons for Rangemode
         if context.scene.actionloader_rangemode == '1':
             rangemode_icon = "SPACE2"
         else:
@@ -343,28 +492,31 @@ class UIListPanelExample(bpy.types.Panel):
         row = layout.row(align=True)
         row.prop(context.scene, 'actionloader_rangemode', expand=True )
         row.label(icon = rangemode_icon)
-        layout.operator("setcustombyrange.action")
+        layout.operator("setcustombyrange.action", icon = "FILE_REFRESH")
         
-        #layout.operator("ttt.action", text ="Scene Markers from Pose Markers")
+        #layout.operator("ttt.action", text ="TTTTTT###TTTTTTTT").nome = "conho"
         layout.label (text = "Other Tools: ")
         layout.operator("delete.action", icon = "ERROR")
-        
+        #.delaction = bpy.data.actions[ob.action_list_index].name
+
         #layout.label (text = "Render Preview:")
         #layout.operator("renderprev.action",text = "Render Preview", icon = "RENDER_ANIMATION")
         
         layout.label(text= "Options:")
-        layout.prop(bpy.context.scene, "actionloader_showicons", text="Show Icons")
-        layout.prop(bpy.context.scene, "actionloader_autorange", text="Set Auto Range")
-        layout.prop(bpy.context.scene, "actionloader_markers", text="Use Action Markers")
-    
-      
+        
+        layout.prop(scn, 'actionloader_DualView', text = "Dual View")
+        layout.prop(scn, "actionloader_showicons", text="Show Icons")
+        layout.prop(scn, "actionloader_autorange", text="Set Auto Range")
+        layout.prop(scn, "actionloader_markers", text="Use Action Markers")
+
+
 class OBJECT_OT_SetActionRange(bpy.types.Operator):
     """Sets current timeline range to action"""
     bl_idname = "set.actionrange"
     bl_label = "Set Action range by timeline"
     def execute(self, context):
         scn = context.scene
-        ActiveAction = context.scene.objects.active.animation_data.action
+        ActiveAction = scn.objects.active.animation_data.action
         print(ActiveAction)
         ActiveAction.use_fake_user = True
         
@@ -396,11 +548,35 @@ class OBJECT_OT_DuplicateAction(bpy.types.Operator):
     bl_label = ""
     
     def execute(self, context):
-        if context.scene.objects.active == None:
-            newAnim = bpy.data.actions[bpy.context.scene.action_list_index].copy()
+        scn = bpy.context.scene
+        ob = scn.objects.active
+        save_action_extras()
+        """
+        #Saves current markers to action
+        if bpy.context.scene.actionloader_markers:
+            save_markers_to_action()
+
+        ### Saves extra stuff on current action
+        ActiveAction = scn.objects.active.animation_data.action
+        ActiveAction.use_fake_user = True
+       
+        ## Assign start and end frame props to current action
+        if scn.actionloader_rangemode == "0" and scn.actionloader_autorange:
+            if scn.use_preview_range: 
+                print("bb")
+                ActiveAction["frame_start"] = scn.frame_preview_start
+                ActiveAction["frame_end"] = scn.frame_preview_end
+            else:
+                print("cc")
+                ActiveAction["frame_start"] = scn.frame_start
+                ActiveAction["frame_end"] = scn.frame_end   
+        """ 
+            
+        if ob == None:
+            newAnim = bpy.data.actions[scn.action_list_index].copy()
         else:
             newAnim = bpy.data.actions[bpy.context.object.action_list_index].copy()
-            bpy.context.object.animation_data.action = newAnim
+            ob.animation_data.action = newAnim
             quickfix_index()
         return{'FINISHED'}   
 
@@ -411,7 +587,10 @@ class OBJECT_OT_UnlinkAction(bpy.types.Operator):
     bl_label = ""
     
     def execute(self, context):
-        context.object.animation_data.action = None
+        ob = bpy.context.scene.objects.active
+        
+        save_action_extras()
+        ob.animation_data.action = None
         return{'FINISHED'}   
 
 
@@ -431,7 +610,8 @@ class OBJECT_OT_speedup(bpy.types.Operator):
     bl_label = ""
     
     def execute(self, context):
-        ob = context.object
+        ob = bpy.context.scene.objects.active
+        #ob = context.object
         ActiveAction = ob.animation_data.action
         global prev_mode 
         
@@ -478,7 +658,8 @@ class OBJECT_OT_customByRange(bpy.types.Operator):
     bl_label = "Set Frame Range"
     
     def execute(self, context):
-        ActiveAction = context.object.animation_data.action
+        ob = bpy.context.scene.objects.active
+        ActiveAction = ob.animation_data.action
         ActiveAction["frame_start"] = ActiveAction.frame_range[0]
         ActiveAction["frame_end"] = ActiveAction.frame_range[1]
         update_rangemode(self, bpy.context)
@@ -490,15 +671,15 @@ class OBJECT_OT_renderprev(bpy.types.Operator):
     bl_idname = "renderprev.action"
     bl_label = ""
     def execute(self, context):
-        cam = bpy.context.scene.render.filepath 
+        scn = bpy.context.scene
+        cam = scn.render.filepath 
         
-        if bpy.context.scene.render.image_settings.file_format == 'THEORA'and bpy.context.scene.render.use_file_extension == False:
+        if scn.render.image_settings.file_format == 'THEORA'and scn.render.use_file_extension == False:
             ext = ".ogv" 
         else:
             ext = ""
         
-        bpy.context.scene.render.filepath = cam + bpy.context.object.animation_data.action.name + ext
-        
+        scn.render.filepath = cam + bpy.context.object.animation_data.action.name + ext
         
         if bpy.context.space_data.show_only_render == False:
             bpy.context.space_data.show_only_render = True
@@ -507,7 +688,7 @@ class OBJECT_OT_renderprev(bpy.types.Operator):
         else:
             bpy.ops.render.opengl(animation=True)
         
-        bpy.context.scene.render.filepath = cam 
+        scn.render.filepath = cam 
         return{'FINISHED'} 
 
 
@@ -516,7 +697,8 @@ class OBJECT_OT_muter(bpy.types.Operator):
     bl_idname = "muteloc.action"
     bl_label = ""
     def execute(self, context):
-        AA = context.object.animation_data.action
+        ob = bpy.context.scene.objects.active
+        AA = ob.animation_data.action
         mute_to = False
         if AA.fcurves.find('location', index=0).mute == False:
             mute_to = True
@@ -539,14 +721,10 @@ class OBJECT_OT_ttt(bpy.types.Operator):
     """TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"""
     bl_idname = "ttt.action"
     bl_label = ""
+    
+    nome = bpy.props.StringProperty()
     def execute(self, context):
-        ActiveAction = context.object.animation_data.action
-        for deli in range(len(bpy.context.scene.timeline_markers)):
-            bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers[0])
-        #adds action markers to timeline
-        for addi in range(len(ActiveAction.pose_markers)):
-            bpy.context.scene.timeline_markers.new(ActiveAction.pose_markers[addi].name, ActiveAction.pose_markers[addi].frame)
-        
+        print (self.nome)
         return{'FINISHED'}   
 
     
@@ -554,56 +732,50 @@ class OBJECT_OT_DeleteAction(bpy.types.Operator):
     """ WARNING: Deletes Action from Blender File"""
     bl_idname = "delete.action"
     bl_label = "Delete Action"
+    #delaction = bpy.props.StringProperty()
     def execute(self, context):
-        set_normal_speed()
-        if context.scene.objects.active == None:
+        #set_normal_speed() 
+        ob = bpy.context.scene.objects.active
+        if ob == None:
             ActionNR = context.scene.action_list_index
         else:
             ActionNR = context.object.action_list_index
         AA = bpy.data.actions[ActionNR] 
         
-        if bpy.context.object:
-            bpy.context.object.action_list_index = bpy.context.object.action_list_index-1
+        if ob:
+            ob.action_list_index = bpy.context.object.action_list_index-1
         else:
             bpy.context.scene.action_list_index = bpy.context.scene.action_list_index-1    
         
         bpy.data.actions.remove(AA, True)
+        #bpy.data.actions.remove(bpy.data.actions[self.delaction], True)
         return{'FINISHED'} 
 
 
 def change_timelinemarkers_from_action():
+    ob = bpy.context.object
+    scn = bpy.context.scene
     # remove markers from timeline  
-    for deli in range(len(bpy.context.scene.timeline_markers)):
-        bpy.context.scene.timeline_markers.remove(bpy.context.scene.timeline_markers[0])
+    for ai in range(len(scn.timeline_markers)):
+        scn.timeline_markers.remove(scn.timeline_markers[0])
     
     #adds action markers to timeline
-    for addi in range(len(bpy.context.object.animation_data.action.pose_markers)):
-        bpy.context.scene.timeline_markers.new(bpy.context.object.animation_data.action.pose_markers[addi].name, bpy.context.object.animation_data.action.pose_markers[addi].frame)    
+    for bi in range(len(ob.animation_data.action.pose_markers)):
+        scn.timeline_markers.new(ob.animation_data.action.pose_markers[bi].name, ob.animation_data.action.pose_markers[bi].frame)    
 
 
 def save_markers_to_action():
-    ActiveAction = bpy.context.object.animation_data.action
+    ob = bpy.context.scene.objects.active
+    AA = ob.animation_data.action
     #delete pose markers from the action
-    for i in range(len(ActiveAction.pose_markers)):
-        bpy.context.object.animation_data.action.pose_markers.remove(bpy.context.object.animation_data.action.pose_markers[0])
+    for i in range(len(AA.pose_markers)):
+        AA.pose_markers.remove(AA.pose_markers[0])
     # assign pose markers from timeline markers
     for i in range(len(bpy.context.scene.timeline_markers)):
-        ActiveAction.pose_markers.new(bpy.context.scene.timeline_markers[i].name)
-        ActiveAction.pose_markers[i].frame = bpy.context.scene.timeline_markers[i].frame
+        AA.pose_markers.new(bpy.context.scene.timeline_markers[i].name)
+        AA.pose_markers[i].frame = bpy.context.scene.timeline_markers[i].frame
   
     
-def set_normal_speed():
-    if bpy.context.object == None or bpy.context.object.animation_data == None or bpy.context.object.animation_data.action == None:
-        pass
-    else:
-        ActiveAction = bpy.context.scene.objects.active.animation_data.action
-        if ActiveAction.get("frame_start") != None:
-            bpy.context.scene.frame_start = ActiveAction["frame_start"]
-            bpy.context.scene.frame_end = ActiveAction["frame_end"]
-    bpy.context.scene.actionloader_speedprev = '0'
-    bpy.context.scene.render.frame_map_new = 100
-
-
 def quickfix_index():
     for x in range(len(bpy.data.actions)): 
         if bpy.data.actions[x] == bpy.context.object.animation_data.action:
@@ -613,28 +785,52 @@ def quickfix_index():
 
 
 def register():
-    bpy.types.Object.action_list_index = bpy.props.IntProperty(update=update_action_list)
-    bpy.types.Scene.action_list_index = bpy.props.IntProperty(update=update_action_list_noObj)
-    
+    bpy.types.Scene.actionloader_DualView = bpy.props.BoolProperty(default= False)
+    bpy.types.Object.action_list_index = bpy.props.IntProperty(
+        update = update_action_list, 
+        description = "Action Loader's highlighted action on list for this object"
+        )
+    bpy.types.Scene.action_list_index = bpy.props.IntProperty(
+        update = update_action_list_noObj, 
+        description = "Action Loader's highlighted action on list for this scene when no object selected"
+        )
     enum_items = (
-    ('0','Custom','Sets Frame Range of action by the current Frame Range'),
-    ('1','Keyframes',"Sets Frame Range by action's first and last keyframe")
-    )
-    bpy.types.Scene.actionloader_rangemode = bpy.props.EnumProperty(items = enum_items, update=update_rangemode)
-    
+        ('0','Custom','Sets Frame Range of action by the current Frame Range'),
+        ('1','Keyframes',"Sets Frame Range by action's first and last keyframe")
+        )
+    bpy.types.Scene.actionloader_rangemode = bpy.props.EnumProperty(
+        items = enum_items, 
+        update = update_rangemode,
+        description = "Set the ranfe for 0: custom or 1: based on keyframes"
+        )
     enum_prevspeed = (
-    ('0','Normal','Set speed to Normal (Time Remapping "frame_map_new" to 100 and adjusts range)'),
-    ('1','1/2x', 'Set speed to half (Time Remapping "frame_map_new" to 200 and adjusts range)'),
-    ('2','1/4x', 'Set speed to a quarter (Time Remapping "frame_map_new" to 400 and adjusts range)'),
-    ('3','1/8x', 'Set speed to an eighth (Time Remapping "frame_map_new" to 800 and adjusts range)')
-    )
-    bpy.types.Scene.actionloader_speedprev = bpy.props.EnumProperty(items = enum_prevspeed, update=update_prevspeed)
-    
-    bpy.types.Scene.actionloader_showicons = bpy.props.BoolProperty(name="Show icons", description="Show icons in Action Loader Addon",default = True)
-    bpy.types.Scene.actionloader_autorange = bpy.props.BoolProperty(name="Set Auto Range", description="Automatically set and load Frame Ranges for each Action",default = True)
-    bpy.types.Scene.actionloader_markers = bpy.props.BoolProperty(name="Set Action Markers", description="Automatically assign pose_markers from action to scene timeline_markers (kind of uses scene Markers as Local Markers)",default = True)
-   
-    
+        ('0','Normal','Set speed to Normal (Time Remapping "frame_map_new" to 100 and adjusts range)'),
+        ('1','1/2', 'Set speed to half (Time Remapping "frame_map_new" to 200 and adjusts range)'),
+        ('2','1/4', 'Set speed to a quarter (Time Remapping "frame_map_new" to 400 and adjusts range)'),
+        ('3','1/8', 'Set speed to an eighth (Time Remapping "frame_map_new" to 800 and adjusts range)')
+        )
+    bpy.types.Scene.actionloader_speedprev = bpy.props.EnumProperty(
+        items = enum_prevspeed,
+        update=update_prevspeed, 
+        set = set_prevspeed, 
+        get = get_prevspeed
+        )
+    bpy.types.Scene.actionloader_showicons = bpy.props.BoolProperty(
+        name = "Show icons", 
+        description = "Show icons in Action Loader Addon",
+        default = True
+        )
+    bpy.types.Scene.actionloader_autorange = bpy.props.BoolProperty(
+        name = "Set Auto Range", 
+        description = "Automatically set and load Frame Ranges for each Action and zoom in on Loading actions",
+        default = True
+        )
+    bpy.types.Scene.actionloader_markers = bpy.props.BoolProperty(
+        name = "Set Action Markers", 
+        description = "Automatically assign pose_markers from action to scene timeline_markers (kind of uses scene Markers as Local Markers)",
+        default = True
+        )
+        
     bpy.utils.register_module(__name__)
 
 
