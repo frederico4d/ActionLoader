@@ -507,7 +507,7 @@ class UIListPanelExample(bpy.types.Panel):
         
         layout.label(text= "Options:")
         
-        layout.prop(scn, 'actionloader_DualView', text = "Dual View")
+        #layout.prop(scn, 'actionloader_DualView', text = "Dual View")
         layout.prop(scn, "actionloader_showicons", text="Show Icons")
         layout.prop(scn, "actionloader_autorange", text="Set Auto Range")
         layout.prop(scn, "actionloader_markers", text="Use Action Markers")
@@ -788,7 +788,7 @@ def quickfix_index():
 
 
 def register():
-    bpy.types.Scene.actionloader_DualView = bpy.props.BoolProperty(default= False)
+    bpy.types.Scene.actionloader_DualView = bpy.props.BoolProperty(default= False, description = "Two List of the Actions so you can have different filters on each. Doesn't affect or change anything in the scene, just for listing.")
     bpy.types.Object.action_list_index = bpy.props.IntProperty(
         update = update_action_list, 
         description = "Action Loader's highlighted action on list for this object"
