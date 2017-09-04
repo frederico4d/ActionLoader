@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Action Loader",
     "author": "Frederico Martins",
-    "version": (1, 7),
+    "version": (1, 8),
     "blender": (2, 78, 0),
     "location": "View3D > Tools > Animation",
     "description": "Lists all Actions and assigns it to active object",
@@ -22,6 +22,8 @@ bl_info = {
 ### optimizações
 
 import bpy
+global extra_info
+extra_info = False
 
 def set_prevspeed(self, value):
     global prev_mode 
@@ -187,25 +189,6 @@ def update_action_list(self, context):
     
     if action == 2: # Has action
         save_action_extras()
-        """
-        ActiveAction = scn.objects.active.animation_data.action
-        ActiveAction.use_fake_user = True
-       
-        ## Assign start and end frame props to current action
-        if scn.actionloader_rangemode == "0" and scn.actionloader_autorange:
-            if context.scene.use_preview_range: 
-                print("bb")
-                ActiveAction["frame_start"] = scn.frame_preview_start
-                ActiveAction["frame_end"] = scn.frame_preview_end
-            else:
-                print("cc")
-                ActiveAction["frame_start"] = scn.frame_start
-                ActiveAction["frame_end"] = scn.frame_end   
-        
-        #Saves current markers to action
-        if scn.actionloader_markers:
-            save_markers_to_action()
-        """ 
     elif action == 0: # No Animation data
         ob.animation_data_create()
 
@@ -275,7 +258,25 @@ class ACTION_UL_list2(bpy.types.UIList):
 class ACTION_UL_list(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         self.use_filter_show = True
-        ob = bpy.context.scene.objects.active
+        
+        if item.get("frame_end") == None:
+                durationf = 0
+                durations = 0
+        else:
+            durationf = item["frame_end"] - item["frame_start"]
+            
+        # Draw Info!  
+        durations = durationf / bpy.context.scene.render.fps 
+        info2 = str(durationf)+ " f. | "+ str(round(durations,6))+ " s. "
+        
+        
+        if item.use_fake_user == True:
+            fakeuser = "F"
+        else:
+            fakeuser = "X"
+        
+        info = str(item.users)+ fakeuser + " | " + str(len(item.pose_markers)) + "m | " + str(durationf) + "f | "+ str(round(durations,6))+ "s"
+                        
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             if bpy.context.scene.actionloader_showicons:
                 layout.prop(item, "name", text="", emboss=False, icon_value=icon)
@@ -283,7 +284,9 @@ class ACTION_UL_list(bpy.types.UIList):
                 layout.prop(item, "name", text="", emboss=False)
                 #layout.operator("delete.action", text="", icon = "ERROR").delaction = bpy.data.actions[ob.action_list_index].name
                 #layout.operator("ttt.action", text ="T").nome = str(self._DATA)
-                #layout.label(text = "", icon = "ERROR")
+            if extra_info:
+                layout.label(text = info)
+            
         elif self.layout_type in {'GRID'}:
             pass
         global filter_name
@@ -823,12 +826,12 @@ def register():
     bpy.types.Scene.actionloader_autorange = bpy.props.BoolProperty(
         name = "Set Auto Range", 
         description = "Automatically set and load Frame Ranges for each Action and zoom in on Loading actions",
-        default = True
+        default = False
         )
     bpy.types.Scene.actionloader_markers = bpy.props.BoolProperty(
         name = "Set Action Markers", 
         description = "Automatically assign pose_markers from action to scene timeline_markers (kind of uses scene Markers as Local Markers)",
-        default = True
+        default = False
         )
         
     bpy.utils.register_module(__name__)
