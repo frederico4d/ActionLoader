@@ -40,4 +40,5 @@ Any comments, ideas etc... are welcome, please issue them!
 [Thread on Blenderartists.org](https://blenderartists.org/forum/showthread.php?420530-AddOn-Action-Loader)
 
 
-Want to to help me out without actually spending money? then [Get some bitcoins!](https://freebitco.in/?r=335281) looks fishy, but it is nothing special, just gives a very small amount of bitcoins hourly, and I get a refferal if you sign up from that link, so thank you for that!
+<script src="https://liberapay.com/Frederico4d/widgets/button.js"></script>
+<noscript><a href="https://liberapay.com/Frederico4d/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
