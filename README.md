@@ -40,5 +40,4 @@ Any comments, ideas etc... are welcome, please issue them!
 [Thread on Blenderartists.org](https://blenderartists.org/forum/showthread.php?420530-AddOn-Action-Loader)
 
 
-Donate:
-<noscript><a href="https://liberapay.com/Frederico4d/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+Donate paypal: frederico4d@gmail.com
