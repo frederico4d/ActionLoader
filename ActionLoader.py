@@ -37,7 +37,11 @@ def set_prevspeed(self, value):
   
 def get_prevspeed(self):
     #print("get")
-    return self["testprop"]
+    try:
+        return self["testprop"];
+    except:
+        return 0;
+    
 
 
 def update_prevspeed(self, context):
@@ -507,7 +511,6 @@ class UIListPanelExample(bpy.types.Panel):
         
         layout.label(text= "Options:")
         
-        #layout.prop(scn, 'actionloader_DualView', text = "Dual View")
         layout.prop(scn, "actionloader_showicons", text="Show Icons")
         layout.prop(scn, "actionloader_autorange", text="Set Auto Range")
         layout.prop(scn, "actionloader_markers", text="Use Action Markers")
