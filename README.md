@@ -40,4 +40,4 @@ Any comments, ideas etc... are welcome, please issue them!
 [Thread on Blenderartists.org](https://blenderartists.org/forum/showthread.php?420530-AddOn-Action-Loader)
 
 
-Donate paypal: frederico4d@gmail.com
+
