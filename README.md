@@ -30,7 +30,7 @@ And:
 
 - It also ads fake users to the actions automatically so you don't have to think about it nor worry about loosing actions.
 
-- There is a filter in the list, so that if you have hundreads of animations, just carefully name them, and use that filter to display only a set of animations, for example, fighting animations can have a tag in the name, and you filter for it etc...
+- There is a filter in the list, so that if you have hundreds of animations, just carefully name them, and use that filter to display only a set of animations, for example, fighting animations can have a tag in the name, and you filter for it etc...
 
 - It also displays some information about the actions, that can be helpfull, currently: the name, number of frames (from the frame range) and duration in seconds, number of users, and if it has a fake user (for your mental sanity check!). 
 
