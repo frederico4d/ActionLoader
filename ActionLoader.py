@@ -178,9 +178,6 @@ def save_action_extras():
             ActiveAction["frame_start"] = scn.frame_start
             ActiveAction["frame_end"] = scn.frame_end   
     
-    #Saves current markers to action
-    if scn.actionloader_markers and ob:
-        save_markers_to_action()    
 
 def update_action_list(self, context):
     #updates every time you pick action in the list
@@ -243,10 +240,7 @@ def update_action_list(self, context):
                         override = {'area': area, 'region': region, 'edit_object': context.edit_object}
                         bpy.ops.time.view_all(override)    
     
-    if scn.actionloader_markers == True:
-        change_timelinemarkers_from_action()
-
-
+    
 class ACTION_UL_list2(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         self.use_filter_show = True
@@ -355,7 +349,6 @@ class ActionLoaderPanel(bpy.types.Panel):
                     action_icon = "ERROR" 
                 elif bpy.data.actions[ob.action_list_index] != ob.animation_data.action:
                     # When the active object's action is different than the one listed on the index
-                    print("DISTINTODIFERENTE")
                     action_icon = "ERROR"                     
                 else: 
                     action_icon = "ACTION"
@@ -507,14 +500,10 @@ class ActionLoaderPanel(bpy.types.Panel):
         layout.operator("delete.action", icon = "ERROR")
         #.delaction = bpy.data.actions[ob.action_list_index].name
 
-        #layout.label (text = "Render Preview:")
-        #layout.operator("renderprev.action",text = "Render Preview", icon = "RENDER_ANIMATION")
-        
         layout.label(text= "Options:")
         
         layout.prop(scn, "actionloader_showicons", text="Show Icons")
         layout.prop(scn, "actionloader_autorange", text="Set Auto Range")
-        layout.prop(scn, "actionloader_markers", text="Use Action Markers")
 
 
 class OBJECT_OT_SetActionRange(bpy.types.Operator):
@@ -558,28 +547,7 @@ class OBJECT_OT_DuplicateAction(bpy.types.Operator):
     def execute(self, context):
         scn = bpy.context.scene
         ob = context.active_object
-        save_action_extras()
-        """
-        #Saves current markers to action
-        if bpy.context.scene.actionloader_markers:
-            save_markers_to_action()
-
-        ### Saves extra stuff on current action
-        ActiveAction = scn.objects.active.animation_data.action
-        ActiveAction.use_fake_user = True
-       
-        ## Assign start and end frame props to current action
-        if scn.actionloader_rangemode == "0" and scn.actionloader_autorange:
-            if scn.use_preview_range: 
-                print("bb")
-                ActiveAction["frame_start"] = scn.frame_preview_start
-                ActiveAction["frame_end"] = scn.frame_preview_end
-            else:
-                print("cc")
-                ActiveAction["frame_start"] = scn.frame_start
-                ActiveAction["frame_end"] = scn.frame_end   
-        """ 
-            
+        save_action_extras()           
         if ob == None:
             newAnim = bpy.data.actions[scn.action_list_index].copy()
         else:
@@ -770,37 +738,11 @@ class OBJECT_OT_DeleteAction(bpy.types.Operator):
         bpy.data.actions.remove(AA, do_unlink=True)
         #bpy.data.actions.remove(bpy.data.actions[self.delaction], True)
         return{'FINISHED'} 
-
-
-def change_timelinemarkers_from_action():
-    ob = bpy.context.object
-    scn = bpy.context.scene
-    # remove markers from timeline  
-    for ai in range(len(scn.timeline_markers)):
-        scn.timeline_markers.remove(scn.timeline_markers[0])
-    
-    #adds action markers to timeline
-    for bi in range(len(ob.animation_data.action.pose_markers)):
-        scn.timeline_markers.new(ob.animation_data.action.pose_markers[bi].name, ob.animation_data.action.pose_markers[bi].frame)    
-
-
-def save_markers_to_action():
-    ob = bpy.context.active_object
-    AA = ob.animation_data.action
-    #delete pose markers from the action
-    for i in range(len(AA.pose_markers)):
-        AA.pose_markers.remove(AA.pose_markers[0])
-    # assign pose markers from timeline markers
-    for i in range(len(bpy.context.scene.timeline_markers)):
-        AA.pose_markers.new(bpy.context.scene.timeline_markers[i].name)
-        AA.pose_markers[i].frame = bpy.context.scene.timeline_markers[i].frame
   
     
 def quickfix_index():
     for x in range(len(bpy.data.actions)): 
         if bpy.data.actions[x] == bpy.context.object.animation_data.action:
-            if bpy.context.scene.actionloader_markers == True:
-                change_timelinemarkers_from_action()
             bpy.context.object.action_list_index = x  
 
 
@@ -845,11 +787,6 @@ def register():
         description = "Automatically set and load Frame Ranges for each Action and zoom in on Loading actions",
         default = False
         )
-    bpy.types.Scene.actionloader_markers = bpy.props.BoolProperty(
-        name = "Set Action Markers", 
-        description = "Automatically assign pose_markers from action to scene timeline_markers (kind of uses scene Markers as Local Markers)",
-        default = False
-        )
 
     for cls in module_classes:
         bpy.utils.register_class(cls[1])
@@ -863,7 +800,6 @@ def unregister():
     del bpy.types.Scene.action_list_index
     del bpy.types.Scene.actionloader_showicons
     del bpy.types.Scene.actionloader_autorange
-    del bpy.types.Scene.actionloader_markers
     del bpy.types.Scene.actionloader_speedprev
 
 
