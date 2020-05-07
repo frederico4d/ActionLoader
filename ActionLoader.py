@@ -11,16 +11,6 @@ bl_info = {
     "category": "Animation",
     }
 
-## TODO
-
-### novas funcoes
-## meter mais paineis duplicaveis em vez de so 2?
-
-## meter o action loader nas properties ou em outro lado 
-#para se puder ver num painel separado, em outro ecra etc...
-
-### optimizações
-
 import bpy
 import inspect
 import sys
@@ -49,7 +39,6 @@ def get_prevspeed(self):
     except:
         return 0;
     
-
 
 def update_prevspeed(self, context):
     speed = bpy.context.scene.actionloader_speedprev
@@ -299,7 +288,7 @@ class ACTION_UL_list(bpy.types.UIList):
 
 class ActionLoaderPanel(bpy.types.Panel):
     """Creates a Panel in the Animation tab of the 3D View's Tools"""
-    bl_label = "Action Loader"
+    bl_label = "Action Loader t2"
     bl_idname = "OBJECT_PT_action_loader"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -392,7 +381,7 @@ class ActionLoaderPanel(bpy.types.Panel):
             row.label (text = info2, icon = "PREVIEW_RANGE")  
             row.label(icon = rangemode_icon)        
             list_context = ob
-
+            """
         elif context.active_object == None and len(bpy.data.actions) >=1:
             
             ListedAction = bpy.data.actions[bpy.context.scene.action_list_index]
@@ -428,7 +417,7 @@ class ActionLoaderPanel(bpy.types.Panel):
             row.label(icon = rangemode_icon)              
             
             list_context = scn
-   
+            """    
         else:
             layout.label (text= "Just start animating!", icon = "INFO")  
             list_context = scn
@@ -533,9 +522,12 @@ class OBJECT_OT_DeselectObject(bpy.types.Operator):
     def execute(self, context):
         if context.scene.action_list_index < 0:
             context.scene.action_list_index = 0
-
-        for obj in context.selected_objects:
-            obj.select_set(False)
+   
+        context.view_layer.objects.active = None
+        
+        #for obj in context.view_layer.selected_objects:
+        #    print("OLA2") 
+        #    obj.select_set(False)
         return {'FINISHED'}
 
 
@@ -741,6 +733,7 @@ class OBJECT_OT_DeleteAction(bpy.types.Operator):
   
     
 def quickfix_index():
+  
     for x in range(len(bpy.data.actions)): 
         if bpy.data.actions[x] == bpy.context.object.animation_data.action:
             bpy.context.object.action_list_index = x  
