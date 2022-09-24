@@ -132,10 +132,10 @@ def update_rangemode(self, context):
         if ActiveAction.get("frame_start") == None:
             pass
         else:
-            context.scene.frame_preview_start = ActiveAction["frame_start"]
-            context.scene.frame_preview_end = ActiveAction["frame_end"]
-            context.scene.frame_start = ActiveAction["frame_start"]
-            context.scene.frame_end = ActiveAction["frame_end"]  
+            context.scene.frame_preview_start = int(ActiveAction["frame_start"])
+            context.scene.frame_preview_end = int(ActiveAction["frame_end"])
+            context.scene.frame_start = int(ActiveAction["frame_start"])
+            context.scene.frame_end = int(ActiveAction["frame_end"])
     elif context.scene.actionloader_rangemode == "1":
         if ActiveAction == None:
             pass
