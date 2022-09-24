@@ -1,8 +1,8 @@
 bl_info = {
     "name": "Action Loader",
     "author": "Frederico Martins",
-    "version": (1, 8),
-    "blender": (2, 81, 0),
+    "version": (2, 0),
+    "blender": (3, 3, 0),
     "location": "View3D > Tools > Animation",
     "description": "Lists all Actions and assigns it to active object",
     "warning": "",
@@ -27,7 +27,7 @@ def set_prevspeed(self, value):
     global old_prevspeed 
     old_prevspeed = bpy.context.scene.actionloader_speedprev
     if bpy.context.scene.actionloader_speedprev == "0":
-        print ("ZERO")
+        #print ("ZERO")
         prev_mode = bpy.context.scene.use_preview_range
     self["testprop"] = value
     
@@ -49,24 +49,24 @@ def update_prevspeed(self, context):
     ActiveAction = ob.animation_data.action
         
     if scn.actionloader_rangemode == "0":
-        sframe = ActiveAction["frame_start"]
-        eframe = ActiveAction["frame_end"]
+        sframe = int(ActiveAction["frame_start"])
+        eframe = int(ActiveAction["frame_end"])
     else:
-        sframe = ActiveAction.frame_range[0]
-        eframe = ActiveAction.frame_range[1]
+        sframe = int(ActiveAction.frame_range[0])
+        eframe = int(ActiveAction.frame_range[1])
     
-    print("OLD: ",old_prevspeed)
+    #print("OLD: ",old_prevspeed)
     
     if speed == "0":
         scn.frame_start = sframe
         scn.frame_end = eframe
         scn.render.frame_map_new = 100
         if old_prevspeed == "1":
-            scn.frame_current = scn.frame_current / 2 
+            scn.frame_current = int(scn.frame_current / 2 )
         elif old_prevspeed == "2":
-            scn.frame_current = scn.frame_current / 4 
+            scn.frame_current =  int(scn.frame_current / 4 )
         elif old_prevspeed == "3":
-            scn.frame_current = scn.frame_current / 8
+            scn.frame_current =  int(scn.frame_current / 8)
         scn.use_preview_range = prev_mode
         
     elif speed == "1":
@@ -74,11 +74,11 @@ def update_prevspeed(self, context):
         scn.frame_end = eframe*2
         scn.render.frame_map_new = 200
         if old_prevspeed == "0":
-            scn.frame_current = scn.frame_current * 2
+            scn.frame_current =  int(scn.frame_current * 2)
         elif old_prevspeed == "2":
-            scn.frame_current = scn.frame_current / 2 
+            scn.frame_current =  int(scn.frame_current / 2 )
         elif old_prevspeed == "3":
-            scn.frame_current = scn.frame_current / 4 
+            scn.frame_current =  int(scn.frame_current / 4 )
         scn.use_preview_range = False
     
     elif speed == "2":
@@ -86,11 +86,11 @@ def update_prevspeed(self, context):
         scn.frame_end = eframe*4
         scn.render.frame_map_new = 400
         if old_prevspeed == "0":
-            scn.frame_current = scn.frame_current * 4
+            scn.frame_current =  int(scn.frame_current * 4)
         elif old_prevspeed == "1":
-            scn.frame_current = scn.frame_current * 2
+            scn.frame_current =  int(scn.frame_current * 2)
         elif old_prevspeed == "3":
-            scn.frame_current = scn.frame_current / 2
+            scn.frame_current =  int(scn.frame_current / 2)
         scn.use_preview_range = False
     
     elif speed == "3":
@@ -98,11 +98,11 @@ def update_prevspeed(self, context):
         scn.frame_end = eframe*8
         scn.render.frame_map_new = 800
         if old_prevspeed == "0":
-            scn.frame_current = scn.frame_current * 8
+            scn.frame_current =  int(scn.frame_current * 8)
         elif old_prevspeed == "1":
-            scn.frame_current = scn.frame_current * 4
+            scn.frame_current =  int(scn.frame_current * 4)
         elif old_prevspeed == "2":
-            scn.frame_current = scn.frame_current * 2
+            scn.frame_current =  int(scn.frame_current * 2)
         scn.use_preview_range = False
     
 
@@ -113,11 +113,11 @@ def set_normal_speed():
     else:
         ActiveAction = bpy.context.active_object.animation_data.action
         if ActiveAction.get("frame_start") != None:
-            scn.frame_start = ActiveAction["frame_start"]
-            scn.frame_end = ActiveAction["frame_end"]
+            scn.frame_start = int(ActiveAction["frame_start"])
+            scn.frame_end = int(ActiveAction["frame_end"])
         else:
-            scn.frame_start = ActiveAction.frame_range[0]
-            scn.frame_end = ActiveAction.frame_range[1]
+            scn.frame_start = int(ActiveAction.frame_range[0])
+            scn.frame_end = int(ActiveAction.frame_range[1]) 
 
     scn.use_preview_range = prev_mode
     scn.actionloader_speedprev = '0'
@@ -140,10 +140,10 @@ def update_rangemode(self, context):
         if ActiveAction == None:
             pass
         else:
-            context.scene.frame_preview_start = ActiveAction.frame_range[0]
-            context.scene.frame_preview_end = ActiveAction.frame_range[1]
-            context.scene.frame_start = ActiveAction.frame_range[0]
-            context.scene.frame_end = ActiveAction.frame_range[1]  
+            context.scene.frame_preview_start = int(ActiveAction.frame_range[0])
+            context.scene.frame_preview_end = int(ActiveAction.frame_range[1])
+            context.scene.frame_start = int(ActiveAction.frame_range[0])
+            context.scene.frame_end = int(ActiveAction.frame_range[1]  )
     
 def update_action_list_noObj(self, context):
     pass
@@ -161,11 +161,11 @@ def save_action_extras():
     ## Assign start and end frame props to current action
     if scn.actionloader_rangemode == "0" and scn.actionloader_autorange:
         if scn.use_preview_range: 
-            ActiveAction["frame_start"] = scn.frame_preview_start
-            ActiveAction["frame_end"] = scn.frame_preview_end
+            ActiveAction["frame_start"] = int(scn.frame_preview_start)
+            ActiveAction["frame_end"] = int(scn.frame_preview_end)
         else:
-            ActiveAction["frame_start"] = scn.frame_start
-            ActiveAction["frame_end"] = scn.frame_end   
+            ActiveAction["frame_start"] = int(scn.frame_start)
+            ActiveAction["frame_end"] = int(scn.frame_end   )
     
 
 def update_action_list(self, context):
@@ -198,16 +198,16 @@ def update_action_list(self, context):
     
     if ActiveAction.get("frame_start") != None and scn.actionloader_autorange:
         if context.scene.actionloader_rangemode == "0":
-            scn.frame_preview_start = ActiveAction["frame_start"]
-            scn.frame_preview_end = ActiveAction["frame_end"] 
-            scn.frame_start = ActiveAction["frame_start"]
-            scn.frame_end = ActiveAction["frame_end"] 
+            scn.frame_preview_start = int(ActiveAction["frame_start"])
+            scn.frame_preview_end = int(ActiveAction["frame_end"] )
+            scn.frame_start = int(ActiveAction["frame_start"])
+            scn.frame_end = int(ActiveAction["frame_end"] )
         
         elif context.scene.actionloader_rangemode == "1":
-            scn.frame_preview_start = ActiveAction.frame_range[0]
-            scn.frame_preview_end = ActiveAction.frame_range[1]
-            scn.frame_start = ActiveAction.frame_range[0]
-            scn.frame_end = ActiveAction.frame_range[1]  
+            scn.frame_preview_start = int(ActiveAction.frame_range[0])
+            scn.frame_preview_end = int(ActiveAction.frame_range[1])
+            scn.frame_start = int(ActiveAction.frame_range[0])
+            scn.frame_end = int(ActiveAction.frame_range[1])
 
         #center stuff on dopesheet etc...
         for area in context.screen.areas:
@@ -288,7 +288,7 @@ class ACTION_UL_list(bpy.types.UIList):
 
 class ActionLoaderPanel(bpy.types.Panel):
     """Creates a Panel in the Animation tab of the 3D View's Tools"""
-    bl_label = "Action Loader t2"
+    bl_label = "Action Loader"
     bl_idname = "OBJECT_PT_action_loader"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -502,7 +502,7 @@ class OBJECT_OT_SetActionRange(bpy.types.Operator):
     def execute(self, context):
         scn = context.scene
         ActiveAction = context.active_object.animation_data.action
-        print(ActiveAction)
+        #print(ActiveAction)
         ActiveAction.use_fake_user = True
         
         if bpy.context.scene.use_preview_range:
@@ -588,29 +588,29 @@ class OBJECT_OT_speedup(bpy.types.Operator):
         else:
             
             if context.scene.actionloader_rangemode == "0":
-                sframe = ActiveAction["frame_start"]
-                eframe = ActiveAction["frame_end"]
+                sframe = int(ActiveAction["frame_start"])
+                eframe = int(ActiveAction["frame_end"])
             else:
-                sframe = ActiveAction.frame_range[0]
-                eframe = ActiveAction.frame_range[1]
+                sframe = int(ActiveAction.frame_range[0])
+                eframe = int(ActiveAction.frame_range[1])
             
             if context.scene.render.frame_map_new == 100:
-                context.scene.frame_start = sframe*2
-                context.scene.frame_end = eframe*2
+                context.scene.frame_start = int(sframe*2)
+                context.scene.frame_end = int(eframe*2)
                 context.scene.render.frame_map_new = 200
                 context.scene.frame_current = context.scene.frame_current*2
                 
                 prev_mode = bpy.context.scene.use_preview_range 
                 context.scene.use_preview_range = False
             elif context.scene.render.frame_map_new == 200:
-                context.scene.frame_start = sframe*4
-                context.scene.frame_end = eframe*4
+                context.scene.frame_start = int(sframe*4)
+                context.scene.frame_end = int(eframe*4)
                 context.scene.render.frame_map_new = 400
                 context.scene.frame_current = context.scene.frame_current*2
                 context.scene.use_preview_range = False
             elif context.scene.render.frame_map_new == 400:
-                context.scene.frame_start = sframe*8
-                context.scene.frame_end = eframe*8
+                context.scene.frame_start = int(sframe*8)
+                context.scene.frame_end = int(eframe*8)
                 context.scene.render.frame_map_new = 800
                 context.scene.frame_current = context.scene.frame_current*2
                 context.scene.use_preview_range = False
@@ -631,8 +631,8 @@ class OBJECT_OT_customByRange(bpy.types.Operator):
             return {'FINISHED'}
 
         ActiveAction = ob.animation_data.action
-        ActiveAction["frame_start"] = ActiveAction.frame_range[0]
-        ActiveAction["frame_end"] = ActiveAction.frame_range[1]
+        ActiveAction["frame_start"] = int(ActiveAction.frame_range[0])
+        ActiveAction["frame_end"] = int(ActiveAction.frame_range[1])
         update_rangemode(self, bpy.context)
         return{'FINISHED'} 
 
@@ -701,7 +701,6 @@ class OBJECT_OT_ttt(bpy.types.Operator):
     
     nome : bpy.props.StringProperty()
     def execute(self, context):
-        print (self.nome)
         return{'FINISHED'}   
 
     
